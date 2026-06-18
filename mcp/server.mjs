@@ -5,11 +5,11 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
-import { buildCaptureEvent, decodeJwtSub, postCursorIngress } from '../lib/ingress-client.mjs';
+import { buildCaptureEvent, resolveUserId, postCursorIngress } from '../lib/ingress-client.mjs';
 import { getApiBase, getJwt } from '../lib/config.mjs';
 
 const server = new Server(
-  { name: 'valuesignal', version: '1.0.2' },
+  { name: 'valuesignal', version: '1.0.3' },
   { capabilities: { tools: {} } }
 );
 
@@ -63,8 +63,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             type: 'text',
             text: [
               'Not authenticated.',
-              '1. Log in at https://app.valuesignal.ai/login.html',
-              '2. DevTools console: sessionStorage.getItem("valueSignalToken")',
+              '1. Log in at https://app.valuesignal.ai',
+              '2. Account Settings → Integrations & API tokens → Generate token',
               '3. Cursor Settings → MCP → valuesignal → env VALUESIGNAL_JWT_TOKEN',
             ].join('\n'),
           },
@@ -73,7 +73,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     }
     let userId = 'unknown';
     try {
-      userId = decodeJwtSub(jwt);
+      userId = await resolveUserId(jwt);
     } catch {
       /* ignore */
     }
@@ -100,7 +100,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
   if (name === 'valuesignal_capture_turn') {
     const jwt = getJwt();
-    const userId = decodeJwtSub(jwt);
+    const userId = await resolveUserId(jwt);
     const event = buildCaptureEvent({
       userId,
       workspaceId: userId,

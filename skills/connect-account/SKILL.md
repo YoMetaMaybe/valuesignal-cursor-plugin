@@ -5,11 +5,21 @@ description: Help the user connect ValueSignal to Cursor by configuring VALUESIG
 
 # Connect ValueSignal
 
-1. Ask the user to log in at https://app.valuesignal.ai/login.html
-2. In the browser console, run: `sessionStorage.getItem('valueSignalToken')`
-3. In Cursor: **Settings → Features → MCP → valuesignal → Edit**
-4. Add environment variable: `VALUESIGNAL_JWT_TOKEN` = the token (no quotes in UI if possible)
-5. Restart MCP or run **Developer: Reload Window**
-6. Run the MCP tool `valuesignal_auth_status` to confirm
+Use a scoped API token (recommended) so you don't have to re-paste a browser
+session token every few days. The token only allows capturing AI activity — it
+can't access the account, billing, or data — and can be revoked anytime.
+
+1. Log in at https://app.valuesignal.ai
+2. Go to **Account Settings → Integrations & API tokens**
+3. Name the token (e.g. "Cursor plugin") and click **Generate token**, then copy
+   the `vs_pat_…` value (it's shown only once)
+4. In Cursor: **Settings → Features → MCP → valuesignal → Edit**
+5. Add environment variable: `VALUESIGNAL_JWT_TOKEN` = the token
+6. Restart MCP or run **Developer: Reload Window**
+7. Run the MCP tool `valuesignal_auth_status` to confirm
+
+A short-lived session token (`sessionStorage.getItem('valueSignalToken')` from
+the browser console) still works as a fallback, but it expires and must be
+re-pasted — prefer the API token above.
 
 Never paste tokens into chat logs or commit them to git.

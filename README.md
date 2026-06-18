@@ -10,16 +10,20 @@ Capture AI-assisted work from Cursor into [ValueSignal](https://valuesignal.ai) 
 
 ## Setup
 
-1. **Log in** at https://app.valuesignal.ai/login.html
-2. Browser console:
-   ```javascript
-   sessionStorage.getItem('valueSignalToken')
-   ```
+Use a scoped API token so you don't have to re-paste credentials. It only
+permits capturing AI activity (not account/billing access) and is revocable.
+
+1. **Log in** at https://app.valuesignal.ai
+2. **Account Settings → Integrations & API tokens → Generate token**, then copy
+   the `vs_pat_…` value (shown once)
 3. **Cursor → Settings → Features → Model Context Protocol → valuesignal → Edit**
 4. Add env var:
-   - `VALUESIGNAL_JWT_TOKEN` = paste token
+   - `VALUESIGNAL_JWT_TOKEN` = paste the token
    - Optional: `VALUESIGNAL_API_BASE` = `https://app.valuesignal.ai`
 5. Enable the MCP server and reload Cursor (**Developer: Reload Window**)
+
+> A short-lived browser session token (`sessionStorage.getItem('valueSignalToken')`)
+> still works as a fallback, but it expires and must be re-pasted. Prefer the API token.
 
 ## MCP tools
 
@@ -41,7 +45,7 @@ VALUESIGNAL_JWT_TOKEN=... node mcp/server.mjs
 
 - **Open source in this repo:** MCP server, skills, rules, and commands only. The ValueSignal API and scoring stack are proprietary and not published here.
 - **Network:** The MCP server sends HTTPS requests only to `VALUESIGNAL_API_BASE` (default `https://app.valuesignal.ai`) when the user runs capture or auth tools. No other outbound endpoints.
-- **Credentials:** Users set `VALUESIGNAL_JWT_TOKEN` in Cursor MCP settings (from their ValueSignal login). Tokens are not stored in the repository.
+- **Credentials:** Users set `VALUESIGNAL_JWT_TOKEN` in Cursor MCP settings — preferably a scoped, revocable API token (`vs_pat_…`) generated in Account Settings, which is limited to activity capture (no account/billing access). A short-lived browser session token also works as a fallback. Tokens are not stored in the repository.
 - **Capture:** Users control what is submitted via `valuesignal_capture_turn`. The bundled rule blocks exfiltration of API keys, passwords, and `.env` content.
 - **Details:** See [SECURITY.md](./SECURITY.md).
 
